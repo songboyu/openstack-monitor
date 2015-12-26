@@ -1,0 +1,6 @@
+{
+	"playback_server_listen": "23456",
+	"record_server_listen": "23457",
+	"log_file": "VNCPlayback-server.log",
+	"data_dir": "data"
+}

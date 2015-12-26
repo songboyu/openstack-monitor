@@ -1,0 +1,20 @@
+2015/12/25 02:50:43 Server Start
+2015/12/25 02:50:43 Playback Server: Listen on WebSocket 0.0.0.0:23456
+2015/12/25 02:50:43 Recorder Server: Listen on TCP 0.0.0.0:23457
+2015/12/25 02:52:03 Playback Server: Emptry Host name in Query
+2015/12/25 02:57:56 Playback Server: Emptry VM UUID in Query
+2015/12/25 02:58:04 Playback Server: Emptry VM UUID in Query
+2015/12/25 02:58:17 Playback Server: Emptry VM UUID in Query
+2015/12/25 02:58:20 Playback Server: Emptry VM UUID in Query
+2015/12/25 02:58:23 Playback Server: Emptry VM UUID in Query
+2015/12/25 02:58:29 Playback Server: Emptry VM UUID in Query
+2015/12/25 02:58:40 Playback Server: Mkdir:  data
+2015/12/25 02:58:40 Playback Server: Got empty Filelist
+2015/12/25 02:59:29 Playback Server: Got empty Filelist
+2015/12/27 00:18:23 Got Signal: interrupt
+2015/12/27 00:18:23 Server exit...
+2015/12/27 03:08:44 Server Start
+2015/12/27 03:08:44 Playback Server: Listen on WebSocket 0.0.0.0:23456
+2015/12/27 03:08:44 Recorder Server: Listen on TCP 0.0.0.0:23457
+2015/12/27 03:59:51 Got Signal: interrupt
+2015/12/27 03:59:51 Server exit...

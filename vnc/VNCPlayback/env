@@ -1,0 +1,4 @@
+# Golang enviroment variable  
+export GOROOT=/usr/local/Cellar/go/1.5.2/libexec
+export PATH=$PATH:$GOROOT/bin  
+export GOPATH=/Users/song/Develop/python/wisemonitor/bin/VNCPlayback
