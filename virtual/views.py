@@ -3,6 +3,8 @@ import re
 import json
 
 import torndb
+from tornado import gen
+from tornado.httpclient import AsyncHTTPClient
 
 from common.api.NovaAPI import *
 from common.init import *
@@ -47,10 +49,44 @@ class Cloud_VM_Data_Handler(WiseHandler):
 class Cloud_VM_Console_Handler(WiseHandler):
     def get(self, uuid):
         vm = get_vm_info_by_uuid(uuid)
-        vnc_url = vm.get_vnc_console('novnc')['console']['url']
-        token = re.findall(r'token=(.*?)', vnc_url)[0]
 
         self.render("virtual/vm_console.html",
                     novnc_host=NOVNC_SERVER_IP,
                     novnc_port=NOVNC_SERVER_PORT,
-                    token=token, vm=vm)
+                    vm=vm)
+
+class Cloud_VM_Console_Record_Handler(WiseHandler):
+    def get(self, uuid):
+        vm = get_vm_info_by_uuid(uuid)
+
+        self.render("virtual/vm_console_record.html",
+                    novnc_host=NOVNC_SERVER_IP,
+                    novnc_port=NOVNC_SERVER_PORT,
+                    vm=vm)
+
+class Cloud_VM_Console_Playback_Handler(WiseHandler):
+    @gen.coroutine
+    @web.asynchronous
+    def get(self, uuid):
+        vm = get_vm_info_by_uuid(uuid)
+        host = vm.to_dict()['OS-EXT-SRV-ATTR:host']
+        playback_server_ip = VNC_PLAYBACK_SERVER_IP
+        playback_server_port = str(VNC_PLAYBACK_SERVER_PORT)
+        playback_server = playback_server_ip + ":" + playback_server_port
+
+        def on_fetch(response):
+            try:
+                result = json.loads(response.body)
+                files = result['data']
+                self.render("virtual/vm_console_playback.html",
+                            files=files, host_address=host,
+                            vm=vm, status=0, playback_server=playback_server)
+            except Exception, e:
+                self.render("virtual/vm_console_playback.html",
+                            files=None, host_address=host,
+                            vm=vm, status=2, playback_server=None)
+
+        http_client = AsyncHTTPClient()
+        query = "?host=%s&vm_uuid=%s" % (host, uuid)
+        url = "http://%s/serv/listfile" % playback_server + query
+        http_client.fetch(url, callback=on_fetch)

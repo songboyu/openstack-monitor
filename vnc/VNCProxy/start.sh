@@ -1,4 +1,1 @@
-ulimit -SHn 65500
-
-env python server.py
-
+python vnc_proxy_server.py

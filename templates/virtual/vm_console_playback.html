@@ -106,8 +106,9 @@ VNC回放
 	
 	function do_delete_file(filename) {
 		var http_protocol = "http://";
-		var base_url = http_protocol + playback_server + "/serv/deletefile?filename="
+		var base_url = http_protocol + playback_server + "/serv/deletefile?filename=";
 		var url = base_url + filename;
+        console.log(url);
 		ajax_get(
 			url,
 			'json',
@@ -155,22 +156,15 @@ VNC回放
             <a href="#">虚拟化</a> <span class="divider">/</span>
         </li>
         <li>
-            <a href="/virtual/xenserver/hosts/">XenServer</a><span class="divider">/</span>
+            <a href="/virtual/vms">虚拟机列表</a><span class="divider">/</span>
         </li>
         <li>
-            <a href="/virtual/xenserver/hosts/{{ host_address }}/">{{ host_address }}</a><span class="divider">/</span>
+            <a href="#">{{ vm.name }}</a><span class="divider">/</span>
         </li>
         <li>
-            <a href="/virtual/xenserver/{{ host_address }}/vms/">VMS</a><span class="divider">/</span>
-        </li>
+            <a href="/virtual/vms/{{ vm.id }}/console">Console</a><span class="divider">/</span>
         <li>
-            <a href="#">{{ vm_info['name_label'] }}</a><span class="divider">/</span>
-        </li>
-        <li>
-            <a href="/virtual/xenserver/{{ host_address }}/vms/{{ vm_ref }}/console/">Console</a><span class="divider">/</span>
-        </li>
-        <li>
-            <a href="/virtual/xenserver/{{ host_address }}/vms/{{ vm_ref }}/console/playback/">Playback</a>
+            <a href="#">Playback</a>
         </li>
     </ul>
     
@@ -210,10 +204,10 @@ VNC回放
                         <thead>
                            <tr role="row">
                             <th rowspan="1" colspan="1" style="width: 30px;">ID</th>
-                            <th class="sorting_asc" rowspan="1" colspan="1" style="width: 100px;">文件大小</th>
+                            <th class="sorting_asc" rowspan="1" colspan="1" style="width: 100px;">文件大小(bytes)</th>
                             <th rowspan="1" colspan="1" style="width: 130px;">开始时间</th>
                             <th rowspan="2" colspan="1" style="width: 130px;">结束时间</th>
-                            <th rowspan="2" colspan="1" style="width: 100px;">时长</th>
+                            <th rowspan="2" colspan="1" style="width: 100px;">时长(s)</th>
                             <th rowspan="1" colspan="1" style="width: 150px;">客户端地址</th>
                             <th rowspan="1" colspan="1" style="width: 150px;">动作</th>
                            </tr>

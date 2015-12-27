@@ -18,3 +18,82 @@
 2015/12/27 03:08:44 Recorder Server: Listen on TCP 0.0.0.0:23457
 2015/12/27 03:59:51 Got Signal: interrupt
 2015/12/27 03:59:51 Server exit...
+2015/12/27 17:37:13 Server Start
+2015/12/27 17:37:13 Playback Server: Listen on WebSocket 0.0.0.0:23456
+2015/12/27 17:37:13 Recorder Server: Listen on TCP 0.0.0.0:23457
+2015/12/27 17:40:41 Recorder Server: New Client:  127.0.0.1:37707
+2015/12/27 17:40:41 Recorder Server: Receive Head information from client
+2015/12/27 17:40:41 Recorder Server: OK
+2015/12/27 17:40:41 Recorder Server: Send HeadReply to client
+2015/12/27 17:40:41 Recorder Server: OK
+2015/12/27 17:40:41 Recorder Server: Mkdir:  /root/vnc/VNCPlayback/src/server/data
+2015/12/27 17:40:41 Recorder Server: Record For: [root2][05137e07-b0da-4e80-a04c-663e5d681a8f]
+2015/12/27 17:40:41 Recorder Server: Receive VNC Data from client.
+2015/12/27 17:42:37 Recorder Server: New Client:  127.0.0.1:37716
+2015/12/27 17:42:37 Recorder Server: Receive Head information from client
+2015/12/27 17:42:37 Recorder Server: OK
+2015/12/27 17:42:37 Recorder Server: Send HeadReply to client
+2015/12/27 17:42:37 Recorder Server: OK
+2015/12/27 17:42:37 Recorder Server: Record For: [root2][05137e07-b0da-4e80-a04c-663e5d681a8f]
+2015/12/27 17:42:37 Recorder Server: Receive VNC Data from client.
+2015/12/27 17:43:22 Recorder Server: New Client:  127.0.0.1:37719
+2015/12/27 17:43:22 Recorder Server: Receive Head information from client
+2015/12/27 17:43:22 Recorder Server: OK
+2015/12/27 17:43:22 Recorder Server: Send HeadReply to client
+2015/12/27 17:43:22 Recorder Server: OK
+2015/12/27 17:43:22 Recorder Server: Record For: [root2][05137e07-b0da-4e80-a04c-663e5d681a8f]
+2015/12/27 17:43:22 Recorder Server: Receive VNC Data from client.
+2015/12/27 17:43:45 Recorder Server: Error reading Data head: read tcp 127.0.0.1:37716: connection reset by peer
+2015/12/27 17:43:45 Recorder Server: Client 127.0.0.1:37716 disconnected.
+2015/12/27 17:44:50 Recorder Server: Error reading Data head: read tcp 127.0.0.1:37707: connection reset by peer
+2015/12/27 17:44:50 Recorder Server: Client 127.0.0.1:37707 disconnected.
+2015/12/27 17:45:53 Recorder Server: Error reading Data head: read tcp 127.0.0.1:37719: connection reset by peer
+2015/12/27 17:45:53 Recorder Server: Client 127.0.0.1:37719 disconnected.
+2015/12/27 17:46:43 Recorder Server: New Client:  127.0.0.1:37729
+2015/12/27 17:46:43 Recorder Server: Receive Head information from client
+2015/12/27 17:46:43 Recorder Server: OK
+2015/12/27 17:46:43 Recorder Server: Send HeadReply to client
+2015/12/27 17:46:43 Recorder Server: OK
+2015/12/27 17:46:43 Recorder Server: Record For: [root2][05137e07-b0da-4e80-a04c-663e5d681a8f]
+2015/12/27 17:46:43 Recorder Server: Receive VNC Data from client.
+2015/12/27 17:47:16 Got Signal: interrupt
+2015/12/27 17:47:16 Server exit...
+2015/12/27 17:47:57 Server Start
+2015/12/27 17:47:57 Playback Server: Listen on WebSocket 0.0.0.0:23456
+2015/12/27 17:47:57 Recorder Server: Listen on TCP 0.0.0.0:23457
+2015/12/27 18:17:13 Playback Server: New WebSocket Client:  173.26.100.16:64369
+2015/12/27 18:17:32 Playback Server: Receive Close Signal, Quit Goroutine Now.
+2015/12/27 18:17:32 Playback Server: Close WebSocket Connection:  173.26.100.16:64369
+2015/12/27 18:17:35 Playback Server: New WebSocket Client:  173.26.100.16:64372
+2015/12/27 18:17:44 Playback Server: Receive Close Signal, Quit Goroutine Now.
+2015/12/27 18:17:44 Playback Server: Close WebSocket Connection:  173.26.100.16:64372
+2015/12/27 18:17:54 Recorder Server: New Client:  127.0.0.1:38011
+2015/12/27 18:17:54 Recorder Server: Receive Head information from client
+2015/12/27 18:17:54 Recorder Server: OK
+2015/12/27 18:17:54 Recorder Server: Send HeadReply to client
+2015/12/27 18:17:54 Recorder Server: OK
+2015/12/27 18:17:54 Recorder Server: Record For: [root2][05137e07-b0da-4e80-a04c-663e5d681a8f]
+2015/12/27 18:17:54 Recorder Server: Receive VNC Data from client.
+2015/12/27 18:18:11 Playback Server: New WebSocket Client:  173.26.100.16:64388
+2015/12/27 18:18:11 Playback Server: Set /root/vnc/VNCPlayback/src/server/data/root2_05137e07-b0da-4e80-a04c-663e5d681a8f_1451211474_173.26.100.16:64377_26359.dat Shared Lock Failed: resource temporarily unavailable
+2015/12/27 18:18:11 Playback Server: Read data from client failed:  read tcp 173.26.100.16:64388: use of closed network connection
+2015/12/27 18:18:20 Recorder Server: Error reading Data head: read tcp 127.0.0.1:38011: connection reset by peer
+2015/12/27 18:18:20 Recorder Server: Client 127.0.0.1:38011 disconnected.
+2015/12/27 18:18:21 Playback Server: New WebSocket Client:  173.26.100.16:64391
+2015/12/27 18:18:29 Playback Server: got EOF in Read head
+2015/12/27 18:18:29 Playback Server: Close WebSocket Connection:  173.26.100.16:64391
+2015/12/27 18:18:29 Playback Server: Read data from client failed:  read tcp 173.26.100.16:64391: use of closed network connection
+2015/12/27 18:20:22 Playback Server: New WebSocket Client:  173.26.100.16:64454
+2015/12/27 18:20:30 Playback Server: got EOF in Read head
+2015/12/27 18:20:30 Playback Server: Close WebSocket Connection:  173.26.100.16:64454
+2015/12/27 18:20:30 Playback Server: Read data from client failed:  read tcp 173.26.100.16:64454: use of closed network connection
+2015/12/27 18:20:58 Got Signal: interrupt
+2015/12/27 18:20:58 Server exit...
+2015/12/27 18:21:43 Server Start
+2015/12/27 18:21:43 Recorder Server: Listen on TCP 0.0.0.0:23457
+2015/12/27 18:21:43 Playback Server: Listen on WebSocket 0.0.0.0:23456
+2015/12/27 18:21:43 Got Signal: interrupt
+2015/12/27 18:21:43 Server exit...
+2015/12/27 18:23:22 Server Start
+2015/12/27 18:23:22 Recorder Server: Listen on TCP 0.0.0.0:23457
+2015/12/27 18:23:22 Playback Server: Listen on WebSocket 0.0.0.0:23456

@@ -6,6 +6,10 @@ url_handlers = [
     (r"/virtual/vms$", Cloud_VMs_Handler),
     # 列出所有主机信息
     (r"/virtual/hosts$", Cloud_Hosts_Handler),
+    # 回放虚拟机控制台
+    (r"/virtual/vms/(.*)/console/playback$", Cloud_VM_Console_Playback_Handler),
+    # 回放虚拟机控制台
+    (r"/virtual/vms/(.*)/console/record", Cloud_VM_Console_Record_Handler),
     # 连接虚拟机控制台
     (r"/virtual/vms/(.*)/console$", Cloud_VM_Console_Handler),
     # 虚拟机详细信息（图表）

@@ -129,7 +129,7 @@
 				    
 				    host = "{{ novnc_host }}";
 				    port = "{{ novnc_port }}";
-				    path = "websockify?host={{ vm.to_dict()['OS-EXT-SRV-ATTR:host'] }}&uuid={{ vm.id }}&record=0";
+				    path = "websockify?host={{ vm.to_dict()['OS-EXT-SRV-ATTR:host'] }}&uuid={{ vm.id }}&record=1";
 			
 				    // if port == 80 (or 443) then it won't be present and should be
 				    // set manually

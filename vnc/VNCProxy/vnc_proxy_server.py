@@ -26,16 +26,13 @@ from gevent import monkey
 monkey.patch_all()
 
 import socket
-import sys
 import struct
 import time
 
 import websockify
 
-import xmlrpclib
 from libvirt_vnc import get_vnc_port_by_uuid
 import settings
-from pprint import pprint
 
 try:
     from urllib.parse import parse_qs, urlparse
@@ -59,31 +56,35 @@ class WebSocketProxy(websockify.WebSocketProxy):
             raise self.EClose("Host not present")
         
         if not args.has_key('uuid') or not len(args['uuid']):
-            raise self.EClose("VM REF not present")
+            raise self.EClose("VM uuid not present")
+
+        if not args.has_key('record') or not len(args['record']):
+            raise self.EClose("record not present")
 
         host = args['host'][0].rstrip('\n')
         uuid = args['uuid'][0].rstrip('\n')
+        record = args['record'][0].rstrip('\n')
         
         port = get_vnc_port_by_uuid(host, uuid)
         
-        return (host, port)
+        return (host, port, uuid, record)
 
-    def new_client(self):
+    def new_client(self, attached_object):
         """
         Called after a new WebSocket connection has been established.
         """
         # 根据websocket client传递过来的PATH
         # 找到UUID对应的vnc location
-        host, port = self.get_target(self.path)
+        host, port, uuid, record = self.get_target(self.path)
         
         # 如果启用了录制VNC数据
-        if self.record:
+        if record == '1':
             vm_info_struct = "<64s128s64s128s"
             start_time = str(int(time.time()))
             client_address = attached_object.client_address[0] + ":" +str(attached_object.client_address[1])
-            vm_info = struct.pack(vm_info_struct, host, vm_ref_id, start_time, client_address)
+            vm_info = struct.pack(vm_info_struct, host, uuid, start_time, client_address)
             
-            fname = "%s_%s_%s.dat" % (host, vm_ref_id, start_time)
+            fname = "%s_%s_%s.dat" % (host, uuid, start_time)
             self.msg("Server Recording to '%s'" % fname)
             
             # Send VMInfo to Recorder Server
@@ -116,14 +117,14 @@ class WebSocketProxy(websockify.WebSocketProxy):
         # Connect to the target
         self.msg("connecting to: %s:%s" % (host, port))
 
-        tsock = self.socket(host, port,connect=True)
+        tsock = self.socket(host, port, connect=True)
         
         if self.verbose and not self.daemon:
             print(self.traffic_legend)
 
         # Start proxying
         try:
-            self.do_proxy(tsock)
+            self.do_proxy(tsock, attached_object)
         except:
             if tsock:
                 tsock.shutdown(socket.SHUT_RDWR)
@@ -135,7 +136,7 @@ class WebSocketProxy(websockify.WebSocketProxy):
 def run_server():
     host = settings.LISTEN_HOST
     port = settings.LISTEN_PORT
-    server = WebSocketProxy(listen_host=host, listen_port=port, verbose=True, record=False)
+    server = WebSocketProxy(listen_host=host, listen_port=port, verbose=False, daemon=True)
     server.start_server()
 
 
