@@ -1,0 +1,54 @@
+<html>
+<head>
+	<title>intances</title>
+	<link rel="stylesheet" type="text/css" href="css/jquery.dataTables.min.css">
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
+	<style>
+	.center{
+		text-align: center;
+	}
+	</style>
+<head>
+<body>
+	<div style="width:900px;margin:auto" class="center">
+	<table id='myTable'>
+	<thead>
+        <tr>
+            <th>id</th>
+            <th>uuid</th>
+            <th>host</th>
+            <th>enable</th>
+            <th>data</th>
+        </tr>
+    </thead>
+    </table>
+	</div>
+</body>
+<script>
+var api_url = "http://173.26.100.211:9898/instances";
+$(document).ready(function(){
+    $('#myTable').DataTable({
+    	"ajax":{
+    		"url": api_url,
+    		"dataSrc": "message"
+    	},
+    	"columns": [
+            { "className": "center", "data": "id" },
+            { "className": "center", "data": "uuid" },
+            { "className": "center", "data": "host" },
+            { "className": "center", "data": "enable" }
+        ],
+        "columnDefs": [
+            {
+                "render": function ( data, type, row ) {
+                    return "<a target='_blank' href='graph.html?uuid="+row.uuid+"'>graph<a>";
+                },
+                "targets": [4]
+            }
+        ]
+
+    });
+});
+</script>
+</html>

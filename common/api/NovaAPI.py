@@ -4,7 +4,7 @@ from settings import *
 
 nova = client.Client(VERSION, USERNAME, PASSWORD, PROJECT_ID, AUTH_URL)
 
-def get_all_vms_info():
+def get_all_vms_info_nova():
     vms_info = []
     for server in nova.servers.list():
         dict = server.to_dict()
@@ -13,14 +13,14 @@ def get_all_vms_info():
         vms_info.append(dict)
     return vms_info
 
-def get_all_hosts_info():
+def get_all_hosts_info_nova():
     hosts_info = []
     for host in nova.hosts.list():
         dict = host.to_dict()
         hosts_info.append(dict)
     return hosts_info
 
-def get_vm_info_by_uuid(uuid):
+def get_vm_info_by_uuid_nova(uuid):
     server = nova.servers.find(id=uuid)
     return server
 

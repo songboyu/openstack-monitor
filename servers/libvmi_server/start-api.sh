@@ -1,0 +1,1 @@
+(nohup python libvmi_api.py > log/api.log 2>&1 &)

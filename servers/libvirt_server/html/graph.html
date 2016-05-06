@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Data Graph</title>
+
+    <script src="js/jquery.min.js"></script>
+    
+    <script src="js/jquery.timepicker.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/jquery.timepicker.css" />
+
+    <script src="js/bootstrap-datepicker.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-datepicker.standalone.css" />
+
+    <script src="js/datepair.js"></script>
+    <script src="js/jquery.datepair.js"></script>
+
+    <script src="js/echarts.js"></script>
+    <style>
+        body {
+            font-family: helvetica, arial, sans-serif;
+            font-size: 15px;
+            line-height: 1.3;
+            margin: 0;
+            padding: 0;
+        }
+        input {
+            font-size: 13px;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            padding: 3px;
+            border: 1px solid #aac;
+        }
+
+        input.time {
+            width: 80px;
+        }
+
+        input.date {
+            width: 90px;
+        }
+
+        #datepair{
+            margin: 20px;
+            text-align: center;
+        }
+        .contaier{
+            width: 70%;
+            text-align: center;
+            margin: auto;
+        }
+        .chart{
+            height: 300px;
+            width: 50%;
+            float: left;  
+        }
+    </style>
+</head>
+<body>
+    <p id="datepair">
+        <input type="text" class="date sdate" />
+        <input type="text" class="time stime" />
+        &nbsp;~&nbsp;
+        <input type="text" class="date edate" />
+        <input type="text" class="time etime" />
+        <button id="sbuttun">查看数据</button>
+        <button id="nbuttun">当前日期</button>
+    </p>
+
+    <div class="contaier">
+        <div id="chart1" class="chart"></div>
+        <div id="chart2" class="chart"></div>
+        <div id="chart3" class="chart"></div>
+        <div id="chart4" class="chart"></div>
+        <div id="chart5" class="chart"></div>
+        <div id="chart6" class="chart"></div>
+    <div>
+    <script type="text/javascript">
+        var api_url = "http://173.26.100.211:9898/instances/";
+        $(document).ready(function(){
+            // initialize input widgets first
+            $('#datepair .time').timepicker({
+                'showDuration': true,
+                'timeFormat': 'H:i'
+            });
+
+            $('#datepair .date').datepicker({
+                'format': 'yyyy-mm-dd',
+                'autoclose': true
+            });
+
+            // initialize datepair
+            $('#datepair').datepair();
+
+            var now = new Date();
+            var stime = new Date(now.getTime() - 60 * 60 * 1000); 
+            $('#datepair .date').datepicker('setDate', now);
+            $('#datepair .stime').timepicker('setTime', stime);
+            $('#datepair .etime').timepicker('setTime', now);
+
+            var uuid = GetQueryString("uuid")
+            var stime = $('#datepair .sdate').val() + " " + $('#datepair .stime').val()
+            var etime = $('#datepair .edate').val() + " " + $('#datepair .etime').val()
+            draw_graph(uuid,stime,etime)
+        })
+
+        $("#sbuttun").click(function(){
+            var uuid = GetQueryString("uuid")
+            var stime = $('#datepair .sdate').val() + " " + $('#datepair .stime').val()
+            var etime = $('#datepair .edate').val() + " " + $('#datepair .etime').val()
+            console.log(stime+" ~ "+etime)
+            draw_graph(uuid,stime,etime)
+        })
+
+        $("#nbuttun").click(function(){
+            var now = new Date();
+            var stime = new Date(now.getTime() - 60 * 60 * 1000); 
+            $('#datepair .date').datepicker('setDate', now);
+            $('#datepair .stime').timepicker('setTime', stime);
+            $('#datepair .etime').timepicker('setTime', now);
+        })
+
+        function GetQueryString(name){
+            var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if(r!=null)return  unescape(r[2]); return null;
+        }
+
+        function draw_graph(uuid,stime,etime){
+            var time = []
+            // 1
+            var cpu_usage = []
+            // 2
+            var memory_usage = []
+            // 3
+            var rx_packets = []
+            var tx_packets = []
+            // 4
+            var rx_bytes = []
+            var tx_bytes = []
+            // 5
+            var rd_req = []
+            var wr_req = []
+            // 6
+            var rd_bytes = []
+            var wr_bytes = []
+
+            $.ajax({
+                type:"POST",
+                url:api_url+uuid,
+                data:{
+                    stime:stime,
+                    etime:etime
+                },
+                dataType:'JSON',
+                success:function(data){
+                    for(var i in data.message){
+                        var item = data.message[i]
+                        time.push(item.time)
+
+                        var jstr = item.result
+                        jstr = jstr.replace(/u'/g,"'")
+                        jstr = jstr.replace(/'/g,"\"")
+                        jstr = jstr.replace(/L/g,"")
+                        // console.log(jstr)
+                        json = JSON.parse(jstr)
+                        cpu_usage.push(json.cpu_usage)
+                        memory_usage.push((parseFloat(json.memory_usage)/1024).toFixed(2))
+                        for(k in json.vir_interfaces){
+                            rx_packets.push(json.vir_interfaces[k].rx_packets)
+                            tx_packets.push(json.vir_interfaces[k].tx_packets)
+                            rx_bytes.push(json.vir_interfaces[k].rx_bytes)
+                            tx_bytes.push(json.vir_interfaces[k].tx_bytes)
+                        }
+                        for(k in json.vir_disks){
+                            rd_req.push(json.vir_disks[k].rd_req)
+                            wr_req.push(json.vir_disks[k].wr_req)
+                            rd_bytes.push(json.vir_disks[k].rd_bytes)
+                            wr_bytes.push(json.vir_disks[k].wr_bytes)
+                        }
+                    }
+                    // 路径配置
+                    require.config({
+                        paths: {
+                            echarts: 'http://echarts.baidu.com/build/dist'
+                        }
+                    });
+                    
+                    require(
+                        [
+                            'echarts',
+                            'echarts/chart/bar',
+                            'echarts/chart/line',
+                        ],
+                        function (ec) {
+                            // CPU使用量
+                            var chart1 = ec.init(document.getElementById('chart1')); 
+                            chart1.setOption({
+                                tooltip : {
+                                    trigger: 'axis',
+                                    showDelay: 0,
+                                    transitionDuration: 0
+                                },
+                                legend: {
+                                    data:['CPU使用量']
+                                },
+                                calculable : true,
+                                xAxis : [{
+                                    name: '时间',
+                                    type: 'category',
+                                    data: time
+                                }],
+                                yAxis : [{
+                                    name: 'CPU使用量(%)',
+                                    type: 'value',
+                                    splitArea: {show: true},
+                                    axisLabel: {show: true},
+                                }],
+                                series : [{
+                                    name: 'CPU使用量',
+                                    type: 'line',
+                                    data: cpu_usage,
+                                    smooth: true,
+                                    clickable: false,
+                                    symbol:'circle'
+                                }]
+                            });
+                            // 内存使用量
+                            var chart2 = ec.init(document.getElementById('chart2'));
+                            chart2.setOption({
+                                tooltip : {
+                                    trigger: 'axis',
+                                    showDelay: 0,
+                                    transitionDuration: 0
+                                },
+                                legend: {
+                                    data:['内存使用量']
+                                },
+                                calculable : true,
+                                xAxis : [{
+                                    name: '时间',
+                                    type: 'category',
+                                    data: time
+                                }],
+                                yAxis : [{
+                                    name: '内存使用量(M)',
+                                    type: 'value',
+                                    splitArea: {show: true},
+                                    axisLabel: {show: true},
+                                }],
+                                series : [{
+                                    name: '内存使用量',
+                                    type: 'line',
+                                    data: memory_usage,
+                                    smooth: true,
+                                    clickable: false,
+                                    symbol:'circle'
+                                }]
+                            });
+                            // 网卡流量
+                            var chart3 = ec.init(document.getElementById('chart3'));
+                            chart3.setOption({
+                                tooltip : {
+                                    trigger: 'axis',
+                                    showDelay: 0,
+                                    transitionDuration: 0
+                                },
+                                legend: {
+                                    data:['下载流量','上传流量']
+                                },
+                                calculable : true,
+                                xAxis : [{
+                                    name: '时间',
+                                    type: 'category',
+                                    data: time
+                                }],
+                                yAxis : [{
+                                    name: '网卡流量(packets)',
+                                    type: 'value',
+                                    splitArea: {show: true},
+                                    axisLabel: {show: true},
+                                }],
+                                series : [{
+                                    name: '下载流量',
+                                    type: 'line',
+                                    data: rx_packets,
+                                    smooth: true,
+                                    clickable: false,
+                                    symbol:'circle'
+                                },
+                                {
+                                    name: '上传流量',
+                                    type: 'line',
+                                    data: tx_packets,
+                                    smooth: true,
+                                    clickable: false,
+                                    symbol:'circle'
+                                }]
+                            });
+                            // 网卡吞吐量
+                            var chart4 = ec.init(document.getElementById('chart4'));
+                            chart4.setOption({
+                                tooltip : {
+                                    trigger: 'axis',
+                                    showDelay: 0,
+                                    transitionDuration: 0
+                                },
+                                legend: {
+                                    data:['下载字节数','上传字节数']
+                                },
+                                calculable : true,
+                                xAxis : [{
+                                    name: '时间',
+                                    type: 'category',
+                                    data: time
+                                }],
+                                yAxis : [{
+                                    name: '网卡吞吐量(bytes)',
+                                    type: 'value',
+                                    splitArea: {show: true},
+                                    axisLabel: {show: true},
+                                }],
+                                series : [{
+                                    name: '下载字节数',
+                                    type: 'line',
+                                    data: rx_bytes,
+                                    smooth: true,
+                                    clickable: false,
+                                    symbol:'circle'
+                                },
+                                {
+                                    name: '上传字节数',
+                                    type: 'line',
+                                    data: tx_bytes,
+                                    smooth: true,
+                                    clickable: false,
+                                    symbol:'circle'
+                                }]
+                            });
+                            // 硬盘读写
+                            var chart5 = ec.init(document.getElementById('chart5'));
+                            chart5.setOption({
+                                tooltip : {
+                                    trigger: 'axis',
+                                    showDelay: 0,
+                                    transitionDuration: 0
+                                },
+                                legend: {
+                                    data:['硬盘读请求','硬盘写请求']
+                                },
+                                calculable : true,
+                                xAxis : [{
+                                    name: '时间',
+                                    type: 'category',
+                                    data: time
+                                }],
+                                yAxis : [{
+                                    name: '硬盘读写',
+                                    type: 'value',
+                                    splitArea: {show: true},
+                                    axisLabel: {show: true},
+                                }],
+                                series : [{
+                                    name: '硬盘读请求',
+                                    type: 'line',
+                                    data: rd_req,
+                                    smooth: true,
+                                    clickable: false,
+                                    symbol:'circle'
+                                },
+                                {
+                                    name: '硬盘写请求',
+                                    type: 'line',
+                                    data: wr_req,
+                                    smooth: true,
+                                    clickable: false,
+                                    symbol:'circle'
+                                }]
+                            });
+                            // IO频率
+                            var chart6 = ec.init(document.getElementById('chart6'));
+                            chart6.setOption({
+                                tooltip : {
+                                    trigger: 'axis',
+                                    showDelay: 0,
+                                    transitionDuration: 0
+                                },
+                                legend: {
+                                    data:['读出字节','写入字节']
+                                },
+                                calculable : true,
+                                xAxis : [{
+                                    name: '时间',
+                                    type: 'category',
+                                    data: time
+                                }],
+                                yAxis : [{
+                                    name: 'IO频率(bytes)',
+                                    type: 'value',
+                                    splitArea: {show: true},
+                                    axisLabel: {show: true},
+                                }],
+                                series : [{
+                                    name: '读出字节',
+                                    type: 'line',
+                                    data: rd_bytes,
+                                    smooth: true,
+                                    clickable: false,
+                                    symbol:'circle'
+                                },
+                                {
+                                    name: '写入字节',
+                                    type: 'line',
+                                    data: wr_bytes,
+                                    smooth: true,
+                                    clickable: false,
+                                    symbol:'circle'
+                                }]
+                            });
+                        }
+                    );
+                }
+            })
+    }
+    </script>
+</body>
+</html>

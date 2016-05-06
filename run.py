@@ -10,7 +10,7 @@ from tornado.options import options
 from common.init import *
 from common.api.loader import load_url_handlers
 from logger import logger
-
+from settings import *
 
 class iApplication(web.Application):
     def __init__(self):
@@ -23,7 +23,7 @@ class iApplication(web.Application):
         }
     
         handlers = [
-            (r"^/$", MainHandler),
+            # (r"^/$", MainHandler),
             (r"^/static/(.*)", web.StaticFileHandler, dict(path=settings['static_path'])),
             (r"^/css/(.*)", web.StaticFileHandler, dict(path=settings['css'])),
             (r"^/js/(.*)", web.StaticFileHandler, dict(path=settings['js'])),
@@ -76,10 +76,7 @@ class Watcher:
     
 
 if __name__ == '__main__':
-    try:
-        port = int(sys.argv[1])
-    except Exception:
-        port = 1984
+    port = SERVER_API_PORT
     
     # Watcher()
     

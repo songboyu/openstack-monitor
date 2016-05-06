@@ -1,0 +1,35 @@
+{
+    "time": "2015-11-14 15:54",
+    "uuid_string": "ba16b497-d49d-4a0b-a00b-246209076bfa",
+    "name": "instance-00000014",
+    "host": "173.26.100.211",
+    "state": 1,
+    "number_cpus": 1,
+    "cpu_usage": "4.667",
+    "max_memory": 524288,
+    "memory_usage": 524288,
+    "vir_interfaces": {
+        "tap9d6c50ed-03": {
+            "rx_packets": 0,
+            "tx_packets": 0,
+            "rx_bytes": 0,
+            "tx_bytes": 0,
+            "rx_errs": 0,
+            "tx_errs": 0,
+            "rx_drop": 0,
+            "tx_drop": 0
+        }
+    },
+    "vir_disks": {
+        "vda": {
+            "rd_req": 0,
+            "wr_req": 1.331264531878126,
+            "allocation": 4595712,
+            "rd_bytes": 0,
+            "wr_bytes": 2726.429761286402,
+            "errs": 0,
+            "capacity": 1073741824,
+            "physical": 4653056
+        }
+    }
+}

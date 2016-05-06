@@ -5,11 +5,6 @@ Data Graph
 {% end %}
 
 {% block extra_head %}
-	<script type="text/javascript">
-		$(document).ready(function(){
-			$("#xenserver_menu").attr({"class": "active", "style": "margin-left: -2px;"});
-		});
-	</script>
 {% end %}
 
 {% block main_content %}
@@ -72,7 +67,7 @@ Data Graph
             <a href="/virtual/vms">虚拟机列表</a> <span class="divider">/</span>
         </li>
         <li>
-            <a id="uuid" href="#">{{ vm.name }}</a>
+            <a id="uuid" href="#">{{ uuid }}</a>
         </li>
     </ul>
     <p id="datepair">
@@ -92,7 +87,7 @@ Data Graph
         <div id="chart4" class="chart"></div>
         <div id="chart5" class="chart"></div>
         <div id="chart6" class="chart"></div>
-        <div id="chart7" class="chart"></div>
+        <!-- <div id="chart7" class="chart"></div> -->
         <div id="chart8" class="chart"></div>
         <div id="chart9" class="chart"></div>
     </div>
@@ -174,7 +169,7 @@ Data Graph
 
             $.ajax({
                 type:"POST",
-                url:api_url+uuid,
+                url:api_url+uuid+'/gragh',
                 data:{
                     stime:stime,
                     etime:etime
@@ -185,34 +180,54 @@ Data Graph
                         var item = data.message[i]
                         time.push(item.time)
 
-                        var jstr = item.result
-                        jstr = jstr.replace(/u'/g,"'")
-                        jstr = jstr.replace(/'/g,"\"")
-                        jstr = jstr.replace(/L/g,"")
-                        // console.log(jstr)
-                        json = JSON.parse(jstr)
+                        // var jstr = item.result
+                        // jstr = jstr.replace(/u'/g,"'")
+                        // jstr = jstr.replace(/'/g,"\"")
+                        // jstr = jstr.replace(/L/g,"")
+                        // // console.log(jstr)
+                        // json = JSON.parse(jstr)
+                        json = item
+
+                        console.log(json)
+
                         cpu_usage.push(json.cpu_usage)
                         memory_usage.push((parseFloat(json.memory_usage)/1024).toFixed(2))
-                        for(k in json.vir_interfaces){
-                            rx_packets.push(json.vir_interfaces[k].rx_packets)
-                            tx_packets.push(json.vir_interfaces[k].tx_packets)
-                            rx_bytes.push(json.vir_interfaces[k].rx_bytes)
-                            tx_bytes.push(json.vir_interfaces[k].tx_bytes)
-                            rx_errs.push(json.vir_interfaces[k].rx_errs / json.vir_interfaces[k].rx_packets)
-                            tx_errs.push(json.vir_interfaces[k].tx_errs / json.vir_interfaces[k].tx_packets)
-                            rx_drop.push(json.vir_interfaces[k].rx_drop / json.vir_interfaces[k].rx_packets)
-                            tx_drop.push(json.vir_interfaces[k].tx_errs / json.vir_interfaces[k].tx_packets)
-                        }
-                        for(k in json.vir_disks){
-                            rd_req.push(json.vir_disks[k].rd_req)
-                            wr_req.push(json.vir_disks[k].wr_req)
-                            rd_bytes.push(json.vir_disks[k].rd_bytes)
-                            wr_bytes.push(json.vir_disks[k].wr_bytes)
-                            io_errs.push(json.vir_disks[k].io_errs)
-                            allocation.push(json.vir_disks[k].allocation / (1024*1024*1024) )
-                            physical.push(json.vir_disks[k].physical / (1024*1024*1024) )
-                            capacity.push(json.vir_disks[k].capacity / (1024*1024*1024) )
-                        }
+                        // for(k in json.vir_interfaces){
+                        //     rx_packets.push(json.vir_interfaces[k].rx_packets)
+                        //     tx_packets.push(json.vir_interfaces[k].tx_packets)
+                        //     rx_bytes.push(json.vir_interfaces[k].rx_bytes)
+                        //     tx_bytes.push(json.vir_interfaces[k].tx_bytes)
+                        //     rx_errs.push(json.vir_interfaces[k].rx_errs / json.vir_interfaces[k].rx_packets)
+                        //     tx_errs.push(json.vir_interfaces[k].tx_errs / json.vir_interfaces[k].tx_packets)
+                        //     rx_drop.push(json.vir_interfaces[k].rx_drop / json.vir_interfaces[k].rx_packets)
+                        //     tx_drop.push(json.vir_interfaces[k].tx_errs / json.vir_interfaces[k].tx_packets)
+                        // }
+                        rx_packets.push(json.net_rx_packets)
+                        tx_packets.push(json.net_tx_packets)
+                        rx_bytes.push(json.net_rx_bytes)
+                        tx_bytes.push(json.net_tx_bytes)
+                        rx_errs.push(json.net_rx_errs / json.net_rx_packets)
+                        tx_errs.push(json.net_tx_errs / json.net_tx_packets)
+                        rx_drop.push(json.net_rx_drop / json.net_tx_packets)
+                        tx_drop.push(json.net_tx_errs / json.net_tx_packets)
+                        // for(k in json.vir_disks){
+                        //     rd_req.push(json.vir_disks[k].rd_req)
+                        //     wr_req.push(json.vir_disks[k].wr_req)
+                        //     rd_bytes.push(json.vir_disks[k].rd_bytes)
+                        //     wr_bytes.push(json.vir_disks[k].wr_bytes)
+                        //     io_errs.push(json.vir_disks[k].io_errs)
+                        //     allocation.push(json.vir_disks[k].allocation / (1024*1024*1024) )
+                        //     physical.push(json.vir_disks[k].physical / (1024*1024*1024) )
+                        //     capacity.push(json.vir_disks[k].capacity / (1024*1024*1024) )
+                        // }
+                        rd_req.push(json.block_rd_req)
+                        wr_req.push(json.block_wr_req)
+                        rd_bytes.push(json.block_rd_bytes)
+                        wr_bytes.push(json.block_wr_bytes)
+                        io_errs.push(json.block_io_errs)
+                        allocation.push(json.block_allocation / (1024*1024*1024) )
+                        physical.push(json.block_physical / (1024*1024*1024) )
+                        capacity.push(json.block_capacity / (1024*1024*1024) )
                     }
                     // 路径配置
                     require.config({
@@ -452,54 +467,7 @@ Data Graph
                                     symbol:'circle'
                                 }]
                             });
-                            // 硬盘读写
-                            var chart7 = ec.init(document.getElementById('chart7'));
-                            chart7.setOption({
-                                tooltip : {
-                                    trigger: 'axis',
-                                    showDelay: 0,
-                                    transitionDuration: 0
-                                },
-                                legend: {
-                                    data:['硬盘读请求','硬盘写请求','IO错误']
-                                },
-                                calculable : true,
-                                xAxis : [{
-                                    name: '时间',
-                                    type: 'category',
-                                    data: time
-                                }],
-                                yAxis : [{
-                                    name: '硬盘读写',
-                                    type: 'value',
-                                    splitArea: {show: true},
-                                    axisLabel: {show: true},
-                                }],
-                                series : [{
-                                    name: '硬盘读请求',
-                                    type: 'line',
-                                    data: rd_req,
-                                    smooth: true,
-                                    clickable: false,
-                                    symbol:'circle'
-                                },
-                                {
-                                    name: '硬盘写请求',
-                                    type: 'line',
-                                    data: wr_req,
-                                    smooth: true,
-                                    clickable: false,
-                                    symbol:'circle'
-                                },
-                                {
-                                    name: 'IO错误',
-                                    type: 'line',
-                                    data: io_errs,
-                                    smooth: true,
-                                    clickable: false,
-                                    symbol:'circle'
-                                }]
-                            });
+                            
                             // IO频率
                             var chart8 = ec.init(document.getElementById('chart8'));
                             chart8.setOption({

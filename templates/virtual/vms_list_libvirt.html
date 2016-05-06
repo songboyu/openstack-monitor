@@ -1,0 +1,127 @@
+{% extends ../base.html %}
+
+{% block title %}
+虚拟机列表
+{% end %}
+
+{% block extra_head %}
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$("#xenserver_menu").attr({"class": "active", "style": "margin-left: -2px;"});
+		});
+	</script>
+    <style>
+    .table td,.table th{
+        text-align: center;
+    }
+    </style>
+{% end %}
+
+{% block main_content %}
+<div>
+    <ul class="breadcrumb">
+        <li>
+            <a href="#">虚拟化</a> <span class="divider">/</span>
+        </li>
+        <li>
+            <a href="/virtual/vms">虚拟机列表</a>
+        </li>
+    </ul>
+    
+    <div>
+        <div class="box span12">
+            <div class="box-header well" data-original-title>
+					<h2><i class="icon-user"></i></h2>
+					<div class="box-icon">
+						<a href="#" class="btn btn-setting btn-round"><i class="icon-cog"></i></a>
+						<a href="#" class="btn btn-minimize btn-round"><i class="icon-chevron-up"></i></a>
+					</div>
+	        </div>
+            
+            <div class="box-content">
+                <div class="row-fluid">
+                    <div class="span6">
+                        <div id="DataTables_Table_0_wrapper" class="dataTables_length">
+                            <label>
+                                <select size="1" name="page_size">
+                                    <option value="10" selected="selected">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="25">25</option>
+                                </select>
+                                 每页数量
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="span6"> <label>
+                            搜索：
+                            <input type="text">
+                        </label> 
+                    </div>
+                    
+			<table class="table table-striped table-bordered bootstrap-datatable">
+                <thead>
+                   <tr role="row">
+                    <th rowspan="1" colspan="1" style="width: 60px;">虚拟机名称</th>
+                    <th rowspan="1" colspan="1" style="width: 100px;">UUID</th>
+                    <th rowspan="1" colspan="1" style="width: 60px;">主机</th>
+                    <th rowspan="1" colspan="1" style="width: 60px;">类型</th>
+                    <th rowspan="1" colspan="1" style="width: 60px;">profile</th>
+                    <th rowspan="1" colspan="1" style="width: 170px;">操作</th>
+                   </tr>
+                </thead>
+                <tbody>
+			{% for vm in vms %}
+				<tr class="even">
+                    <td class="center">{{ vm['name'] }}</td>
+                    <td class="center">{{ vm['uuid'] }}</td>
+                    <td class="center">{{ vm['host'] }}</td>
+                    <td class="center">{{ 'windows' if vm['windows']==1 else 'linux'}}</td>
+                    <td class="center">{{ vm['profile'] }}</td>
+                    
+                    <td>
+					<div class="btn-toolbar" style="margin-top:0px;margin-bottom:0px">
+						<div class="btn-group" style="margin: 0">
+							<a class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+								<i class="icon-globe icon-white"></i> 控制台
+								<span class="caret"></span>
+							</a>
+							<ul class="dropdown-menu">
+								<li><a href="/virtual/vms/{{ vm['uuid'] }}/console?host={{ vm['host'] }}">连接</a></li>
+								<li class="divider"></li>
+                                <li><a href="/virtual/vms/{{ vm['uuid'] }}/console/record?host={{ vm['host'] }}">录制</a></li>
+								<li class="divider"></li>
+								<li><a href="/virtual/vms/{{ vm['uuid'] }}/console/playback?host={{ vm['host'] }}">回放</a></li>
+							</ul>
+						</div>
+
+						<div class="btn-group" style="margin-left: -6px;">
+							<a class="btn btn-success" href="/virtual/vms/{{ vm['uuid'] }}/gragh">
+								<i class="icon-fullscreen icon-white"></i> 图表
+							</a>
+						</div>
+
+						<div class="btn-group" style="margin-left: -6px;">
+							<a class="btn btn-success" href="/virtual/vms/{{ vm['uuid'] }}/vmi?host={{ vm['host'] }}&windows={{ vm['windows'] }}">
+								<i class="icon-tasks icon-white"></i> vmi
+							</a>
+						</div>
+                        <div class="btn-group" style="margin-left: -6px;">
+                            <a class="btn btn-success" href="/virtual/vms/{{ vm['uuid'] }}/file_change?host={{ vm['host'] }}&name={{ vm['name'] }}">
+                                <i class="icon-tasks icon-white"></i> 文件变化
+                            </a>
+                        </div>
+					</div>
+                    </td>
+                </tr>
+			{% end %}
+			</tbody>
+			</table>
+                </div>
+            </div>
+        </div>
+    </div>
+		
+</div>
+{% end %}

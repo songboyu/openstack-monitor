@@ -1,0 +1,161 @@
+{% extends ../base.html %}
+
+{% block title %}
+虚拟机列表
+{% end %}
+
+{% block extra_head %}
+    <script type="text/javascript" src="/js/heartcode-canvasloader-min-0.9.1.js"></script>
+    <style>
+    .table td,.table th{
+        text-align: center;
+    }
+    #res_content{
+        float: left;
+        width: 78%;
+        margin-left: 2%
+    }
+    #load_pre{
+        min-height: 500px;
+        text-align: left;
+    }
+    #canvasloader-container{
+        position:absolute;
+        top:50%;
+        left:66%;
+    }
+    </style>
+{% end %}
+
+{% block main_content %}
+<div>
+    <ul class="breadcrumb">
+        <li>
+            <a href="#">虚拟化</a> <span class="divider">/</span>
+        </li>
+        <li>
+            <a href="/virtual/vms">虚拟机列表</a> <span class="divider">/</span>
+        </li>
+        <li>
+            <a id="uuid" href="#">{{ uuid }}</a>
+        </li>
+    </ul>
+    
+    <div>
+        <div class="container-fluid" style="padding-left:0px;padding-right:0px">
+        <div class="row-fluid">
+            <div class="main-menu-span" style="width:20%">
+                <div class="well nav-collapse sidebar-nav">
+                    <ul class="nav nav-tabs nav-stacked main-menu">
+                        <li class="nav-header hidden-tablet">实时数据</li>
+                        {% if windows == '0' %}
+                        <li class="command" data="linux_psaux">
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet"> 进程列表(linux_psaux)</span>
+                            </a>
+                        </li>
+                        <li class="command" data="linux_cpuinfo">
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet"> cpu信息(linux_cpuinfo)</span>
+                            </a>
+                        </li>
+                        <li class="command" data="linux_lsmod">
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet"> 内核模块信息(linux_lsmod)</span>
+                            </a>
+                        </li>
+                        <li class="command" data="linux_dmesg">
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet"> dmesg信息(linux_dmesg)</span>
+                            </a>
+                        </li>
+                        <li class="command" data="linux_arp">
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet"> arp信息(linux_arp)</span>
+                            </a>
+                        </li>
+                        <li class="command" data="linux_ifconfig">
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet"> 网络接口(linux_ifconfig)</span>
+                            </a>
+                        </li>
+                        <li class=" command" data="linux_netstat">
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet"> 网络信息(linux_netstat)</span>
+                            </a>
+                        </li>
+                        <li class="command" data="linux_iomem">
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet"> IO设备地址(linux_iomem)</span>
+                            </a>
+                        </li>
+                        <li class="command" data="linux_mount">
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet"> 设备挂载信息(linux_mount)</span>
+                            </a>
+                        </li>
+                        <li class="command" data="linux_lsof">
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet"> 设备/文件/管道占用(linux_lsof)</span>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li>
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet command" data="linux_ifconfig"> ifconfig</span>
+                            </a>
+                        </li>
+                        {% end %}
+                    </ul>
+                </div>
+            </div>
+            <div id="canvasloader-container" class="wrapper"></div>
+            <div id="res_content">
+                <pre id='load_pre'>结果显示区</pre>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var cl = new CanvasLoader('canvasloader-container');
+    cl.setColor('#000000'); // default is '#000000'
+    cl.setShape('oval'); // default is 'oval'
+    cl.setDiameter(30); // default is 40
+    cl.setDensity(24); // default is 40
+    cl.setRange(1); // default is 1.3
+    cl.setFPS(14); // default is 24
+    // cl.show();
+    $(document).ready(function(){
+        $("#xenserver_menu").attr({"class": "active", "style": "margin-left: -2px;"});
+    });
+    $(".command").click(function(){
+        var command = $(this).attr("data");
+        console.log(command);
+        $.ajax({
+             type: "GET",
+             url: "http://{{ host }}:9899/command/{{ uuid }}/"+command,
+             beforeSend: function (XHR) 
+             {   
+                 cl.show(); // Hidden by default
+             },
+             success: function(data){
+                 cl.hide();
+                 $('#load_pre').html(data);
+              }
+         });
+    });
+</script>
+{% end %}
