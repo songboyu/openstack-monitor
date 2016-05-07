@@ -21,13 +21,18 @@ profiles = {}
 for line in ret:
     profiles[line['uuid']] = (line['name'], line['profile'])
 
-def getHash(f):  
-    line=f.readline()  
-    hash=hashlib.md5()  
-    while(line):  
-        hash.update(line)  
-        line=f.readline()  
-    return hash.hexdigest() 
+def GetFileMd5(filename):
+    if not os.path.isfile(filename):
+        return
+    myhash = hashlib.md5()
+    f = file(filename,'rb')
+    while True:
+        b = f.read(8096)
+        if not b :
+            break
+        myhash.update(b)
+    f.close()
+    return myhash.hexdigest()
 
 class command(threading.Thread):
     def __init__(self, uuid, command):
@@ -88,8 +93,7 @@ class linux_file_change(threading.Thread):
             size = c[4]
             ret = db.select(table, where="`uuid`='%s' and `path`='%s' order by time desc" % (self.uuid, self.path))
 
-            f_new = open('files/%s' % filename,'rb')
-            md5_new = getHash(f_new)
+            md5_new = GetFileMd5('files/%s' % filename)
             
             if len(ret) == 0:
                 db.insert(table,uuid = self.uuid,
@@ -101,7 +105,7 @@ class linux_file_change(threading.Thread):
                                 md5 = md5_new
                                 )
             else:
-                md5_old = getHash(list(ret)[0]['md5'])
+                md5_old = list(ret)[0]['md5']
 
                 if md5_old != md5_new:
                     db.insert(table,uuid = self.uuid,
