@@ -28,11 +28,6 @@ def getHash(f):
         hash.update(line)  
         line=f.readline()  
     return hash.hexdigest() 
-     
-def IsHashEqual(f1,f2):  
-    str1=getHash(f1)  
-    str2=getHash(f2)  
-    return str1==str2 
 
 class command(threading.Thread):
     def __init__(self, uuid, command):
@@ -70,13 +65,14 @@ class linux_file_change(threading.Thread):
         self.path = path 
 
     def run(self):
-        table = 'file_change_history'
-        (name, profile) = profiles[self.uuid]
-        cmd = 'python vol.py -l vmi://%s --profile=%s linux_find_file -F "%s"' % (name, profile, self.path)
-        res = os.popen(cmd).read()
-        # logger.debug(res)
-        inode = res[109:127]
         while True:
+            table = 'file_change_history'
+            (name, profile) = profiles[self.uuid]
+            cmd = 'python vol.py -l vmi://%s --profile=%s linux_find_file -F "%s"' % (name, profile, self.path)
+            res = os.popen(cmd).read()
+            # logger.debug(res)
+            inode = res[109:127]
+
             ctime = time.strftime('%Y-%m-%d-%H:%M:%S', time.localtime())
             filename = self.path.split('/')[-1]
             filename = '%s_%s_%s' % (self.uuid, ctime, filename)
@@ -92,24 +88,29 @@ class linux_file_change(threading.Thread):
             size = c[4]
             ret = db.select(table, where="`uuid`='%s' and `path`='%s' order by time desc" % (self.uuid, self.path))
 
+            f_new = open('files/%s' % filename,'rb')
+            md5_new = getHash(f_new)
+            
             if len(ret) == 0:
                 db.insert(table,uuid = self.uuid,
                                 path = self.path,
                                 size = size,
-                                access=access,
+                                access = access,
                                 time = ctime,
-                                filename=filename
+                                filename = filename,
+                                md5 = md5_new
                                 )
             else:
-                f_old = open('files/'+list(ret)[0]['filename'],'rb')
-                f_new = open('files/%s' % filename,'rb')
-                if not IsHashEqual(f_old, f_new):
+                md5_old = getHash(list(ret)[0]['md5'])
+
+                if md5_old != md5_new:
                     db.insert(table,uuid = self.uuid,
                                     path = self.path,
                                     size = size,
-                                    access=access,
+                                    access = access,
                                     time = ctime,
-                                    filename=filename
+                                    filename = filename,
+                                    md5 = md5_new
                                     )
                 else:
                     cmd = 'rm -rf files/%s' % filename
