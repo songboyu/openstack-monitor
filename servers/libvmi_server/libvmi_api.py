@@ -23,7 +23,7 @@ for line in ret:
 class Command(object):
     def GET(self, uuid, command):
         print uuid,command
-        # web.header('Access-Control-Allow-Origin','*')
+        web.header('Access-Control-Allow-Origin','*')
         profile = profiles[uuid]
 
         cmd = 'python vol.py -f images/%s.dd --profile=%s %s' % (uuid, profile, command)
