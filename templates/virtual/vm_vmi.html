@@ -48,74 +48,80 @@
                 <div class="well nav-collapse sidebar-nav">
                     <ul class="nav nav-tabs nav-stacked main-menu">
                         <li class="nav-header hidden-tablet">实时数据</li>
-                        {% if windows == '0' %}
-                        <li class="command" data="linux_psaux">
+                        <li class="command_realtime" data="pslist">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
-                                <span class="hidden-tablet"> 进程列表(linux_psaux)</span>
+                                <span class="hidden-tablet"> 进程列表(pslist)</span>
                             </a>
                         </li>
-                        <li class="command" data="linux_cpuinfo">
+                        {% if windows == '0' %}
+                        <li class="command_realtime" data="linux_cpuinfo">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> cpu信息(linux_cpuinfo)</span>
                             </a>
                         </li>
-                        <li class="command" data="linux_lsmod">
+                        <li class="command_realtime" data="linux_lsmod">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> 内核模块信息(linux_lsmod)</span>
                             </a>
                         </li>
-                        <li class="command" data="linux_dmesg">
+                        <li class="command_realtime" data="linux_dmesg">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> dmesg信息(linux_dmesg)</span>
                             </a>
                         </li>
-                        <li class="command" data="linux_arp">
+                        <li class="command_realtime" data="linux_arp">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> arp信息(linux_arp)</span>
                             </a>
                         </li>
-                        <li class="command" data="linux_ifconfig">
+                        <li class="command_realtime" data="linux_ifconfig">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> 网络接口(linux_ifconfig)</span>
                             </a>
                         </li>
-                        <li class=" command" data="linux_netstat">
+                        <li class="command_realtime" data="linux_netstat">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> 网络信息(linux_netstat)</span>
                             </a>
                         </li>
-                        <li class="command" data="linux_iomem">
+                        <li class="command_realtime" data="linux_iomem">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> IO设备地址(linux_iomem)</span>
                             </a>
                         </li>
-                        <li class="command" data="linux_mount">
+                        <li class="command_realtime" data="linux_mount">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> 设备挂载信息(linux_mount)</span>
                             </a>
                         </li>
-                        <li class="command" data="linux_lsof">
+                        {% else %}
+                        {% end %}
+                    </ul>
+                    <ul class="nav nav-tabs nav-stacked main-menu">
+                        <li class="nav-header hidden-tablet">非实时数据</li>
+                        {% if windows == '0' %}
+                        <li class="command_not_realtime" data="linux_psaux">
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet"> 进程列表(linux_psaux)</span>
+                            </a>
+                        </li>
+                        <li class="command_not_realtime" data="linux_lsof">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> 设备/文件/管道占用(linux_lsof)</span>
                             </a>
                         </li>
                         {% else %}
-                        <li>
-                            <a class="ajax_link" href="#">
-                                <i class="icon-align-justify"></i>
-                                <span class="hidden-tablet command" data="linux_ifconfig"> ifconfig</span>
-                            </a>
-                        </li>
                         {% end %}
                     </ul>
                 </div>
@@ -138,15 +144,15 @@
     cl.setRange(1); // default is 1.3
     cl.setFPS(14); // default is 24
     // cl.show();
+
     $(document).ready(function(){
         $("#xenserver_menu").attr({"class": "active", "style": "margin-left: -2px;"});
     });
-    $(".command").click(function(){
-        var command = $(this).attr("data");
-        console.log(command);
+
+    function ajax_command(url){
         $.ajax({
              type: "GET",
-             url: "http://{{ host }}:9899/command/{{ uuid }}/"+command,
+             url: url,
              beforeSend: function (XHR) 
              {   
                  cl.show(); // Hidden by default
@@ -156,6 +162,19 @@
                  $('#load_pre').html(data);
               }
          });
+    }
+
+    $(".command_realtime").click(function(){
+        var command = $(this).attr("data");
+        console.log(command);
+        ajax_command("http://{{ host }}:9899/command/realtime/{{ uuid }}/"+command);
     });
+
+    $(".command_not_realtime").click(function(){
+        var command = $(this).attr("data");
+        console.log(command);
+        ajax_command("http://{{ host }}:9899/command/not_realtime/{{ uuid }}/"+command);
+    });
+
 </script>
 {% end %}

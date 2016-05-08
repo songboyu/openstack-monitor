@@ -4,31 +4,75 @@ import os
 import json
 import time
 import web
-from libvmi_monitor_settings import *
 
+import pyvmi
 from gevent import monkey
 monkey.patch_all()
 from gevent.wsgi import WSGIServer
 
-web.config.debug = True
+from libvmi_monitor_settings import *
 
+web.config.debug = True
 db = web.database(dbn=db_engine, host=db_server, db=db_database,
                                user=db_username, pw=db_password)
-ret = db.select('cloud_vhost',what='uuid,profile')
-
+ret = db.select('cloud_vhost',what='uuid,name,windows,profile')
 profiles = {}
-for line in ret:
-    profiles[line['uuid']] = line['profile']
 
-class Command(object):
+for line in ret:
+    profiles[line['uuid']] = (line['windows'], line['name'], line['profile'])
+
+def get_processes(vmi, win):
+    # print win
+    if win == 1 or win == '1':
+        tasks_offset = vmi.get_offset("win_tasks")
+        name_offset = vmi.get_offset("win_pname") - tasks_offset
+        pid_offset = vmi.get_offset("win_pid") - tasks_offset
+        list_head = vmi.read_addr_ksym("PsInitialSystemProcess")
+    else:
+        tasks_offset = vmi.get_offset("linux_tasks")
+        name_offset = vmi.get_offset("linux_name") - tasks_offset
+        pid_offset = vmi.get_offset("linux_pid") - tasks_offset
+        list_head = vmi.translate_ksym2v("init_task")
+
+    next_process = vmi.read_addr_va(list_head + tasks_offset, 0)
+    list_head = next_process
+
+    while True:
+        procname = vmi.read_str_va(next_process + name_offset, 0)
+        pid = vmi.read_32_va(next_process + pid_offset, 0)
+        next_process = vmi.read_addr_va(next_process, 0)
+
+        if (pid < 1<<16):
+            yield pid, procname
+        if (list_head == next_process):
+            break
+
+class Command_not_realtime(object):
     def GET(self, uuid, command):
         print uuid,command
         web.header('Access-Control-Allow-Origin','*')
-        profile = profiles[uuid]
+        (win, name, profile) = profiles[uuid]
 
         cmd = 'python vol.py -f images/%s.dd --profile=%s %s' % (uuid, profile, command)
         res = os.popen(cmd).read()
         return res
+
+class Command_realtime(object):
+    def GET(self, uuid, command):
+        print uuid,command
+        web.header('Access-Control-Allow-Origin','*')
+        (win, name, profile) = profiles[uuid]
+        if command == 'pslist':
+            vmi = pyvmi.init(name, "complete")
+            pslist = get_processes(vmi, win)
+            res = ''
+            for pid, procname in pslist:
+                res += "[%5d] %s" % (pid, procname)+'\n'
+            return res
+        else:
+            cmd = 'python vol.py -l vmi://%s --profile=%s %s' % (name, profile, command)
+            res = os.popen(cmd).read()
+            return res
 
 class FileDownload(object):
     def GET(self,filename):
@@ -52,7 +96,8 @@ class FileDownload(object):
 
 if __name__ == '__main__':
     urls = (
-        '/command/(.*)/(.*)','Command',
+        '/command/not_realtime/(.*)/(.*)','Command_not_realtime',
+        '/command/realtime/(.*)/(.*)','Command_realtime',
         '/filedownload/(.*)','FileDownload',
     )
     try:
