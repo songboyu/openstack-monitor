@@ -55,6 +55,7 @@ class Command_realtime_image(object):
 
         cmd = 'python vol.py -f images/%s.dd --profile=%s %s' % (uuid, profile, command)
         res = os.popen(cmd).read()
+        res = command+'\n\n'+res
         return res
 
 class Command_realtime_vmi(object):
@@ -68,10 +69,12 @@ class Command_realtime_vmi(object):
             res = ''
             for pid, procname in pslist:
                 res += "[%5d] %s" % (pid, procname)+'\n'
+            res = command+'\n\n'+res
             return res
         else:
             cmd = 'python vol.py -l vmi://%s --profile=%s %s' % (name, profile, command)
             res = os.popen(cmd).read()
+            res = command+'\n\n'+res
             return res
 
 class Command_not_realtime(object):
@@ -85,6 +88,8 @@ class Command_not_realtime(object):
         if len(ret) > 0:
             line = ret[0]
             res = str(line['time']) +'\n\n' + line['value']
+        
+        res = command+'\n\n'+res
         return res
 
 class FileDownload(object):
