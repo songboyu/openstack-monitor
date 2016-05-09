@@ -104,6 +104,36 @@
                             </a>
                         </li>
                         {% else %}
+                        <!-- <li class="command_realtime_vmi" data="pslist">
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet"> 进程列表(pslist)</span>
+                            </a>
+                        </li> -->
+                        <li class="command_realtime_vmi" data="envars">
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet"> 环境变量(envars)</span>
+                            </a>
+                        </li>
+                        <li class="command_realtime_vmi" data="connections">
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet"> 网络连接(connections)</span>
+                            </a>
+                        </li>
+                        <li class="command_realtime_vmi" data="sockets">
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet"> sockets连接(sockets)</span>
+                            </a>
+                        </li>
+                        <li class="command_realtime_vmi" data="modules">
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet"> 模块信息(modules)</span>
+                            </a>
+                        </li>
                         {% end %}
                     </ul>
                     <ul class="nav nav-tabs nav-stacked main-menu">
@@ -127,34 +157,17 @@
                     <ul class="nav nav-tabs nav-stacked main-menu">
                         <li class="nav-header hidden-tablet">非实时数据</li>
                         {% if windows == '1' %}
-                        <li class="command_not_realtime" data="pslist">
+                        
+                        <li class="command_realtime_vmi" data="dlllist">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
-                                <span class="hidden-tablet"> 进程列表(pslist)</span>
+                                <span class="hidden-tablet"> 进程DLL信息(dlllist)</span>
                             </a>
                         </li>
                         <li class="command_not_realtime" data="hivelist">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> 注册表信息(hivelist)</span>
-                            </a>
-                        </li>
-                        <li class="command_not_realtime" data="dlllist">
-                            <a class="ajax_link" href="#">
-                                <i class="icon-align-justify"></i>
-                                <span class="hidden-tablet"> 进程DLL信息(dlllist)</span>
-                            </a>
-                        </li>
-                        <li class="command_not_realtime" data="envars">
-                            <a class="ajax_link" href="#">
-                                <i class="icon-align-justify"></i>
-                                <span class="hidden-tablet"> 环境变量(envars)</span>
-                            </a>
-                        </li>
-                        <li class="command_not_realtime" data="netscan">
-                            <a class="ajax_link" href="#">
-                                <i class="icon-align-justify"></i>
-                                <span class="hidden-tablet"> 网络信息(netscan)</span>
                             </a>
                         </li>
                         <li class="command_not_realtime" data="consoles">
@@ -181,12 +194,7 @@
                                 <span class="hidden-tablet"> 驱动信息(driverscan)</span>
                             </a>
                         </li>
-                        <li class="command_not_realtime" data="modules">
-                            <a class="ajax_link" href="#">
-                                <i class="icon-align-justify"></i>
-                                <span class="hidden-tablet"> 模块信息(modules)</span>
-                            </a>
-                        </li>
+                        
                         <li class="command_not_realtime" data="iehistory">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>

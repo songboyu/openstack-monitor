@@ -129,8 +129,8 @@ def main():
     for (uuid,(win,name,profile)) in profiles.items():
         if win == 1:
             # windows进程列表
-            t = command_vmi(uuid, 'pslist')
-            threads.append(t)
+            # t = command_vmi(uuid, 'pslist')
+            # threads.append(t)
             # windows注册表
             t = command_vmi(uuid, 'hivelist')
             threads.append(t)
@@ -141,14 +141,12 @@ def main():
             # t = command_vmi(uuid, 'connections')
             # threads.append(t)
             # windows环境变量
-            t = command_vmi(uuid, 'envars')
-            threads.append(t)
+            # t = command_vmi(uuid, 'envars')
+            # threads.append(t)
             # windows sockets
             # t = command_vmi(uuid, 'sockets')
             # threads.append(t)
-            # windows 网络信息
-            t = command_vmi(uuid, 'netscan')
-            threads.append(t)
+            
             # windows 控制台
             t = command_vmi(uuid, 'consoles')
             threads.append(t)
@@ -156,8 +154,8 @@ def main():
             t = command_vmi(uuid, 'iehistory')
             threads.append(t)
             # windows 模块信息
-            t = command_vmi(uuid, 'modules')
-            threads.append(t)
+            # t = command_vmi(uuid, 'modules')
+            # threads.append(t)
             # windows 驱动信息
             t = command_vmi(uuid, 'driverscan')
             threads.append(t)
@@ -183,5 +181,5 @@ def main():
     for t in threads:
         t.join()
 
-if __name__ == '__main__':    
+if __name__ == '__main__':
     main()
