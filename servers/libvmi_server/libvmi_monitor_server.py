@@ -135,8 +135,8 @@ def main():
             t = command_vmi(uuid, 'hivelist')
             threads.append(t)
             # windows进程dll信息
-            t = command_vmi(uuid, 'dlllist')
-            threads.append(t)
+            # t = command_vmi(uuid, 'dlllist')
+            # threads.append(t)
             # windows网络连接
             # t = command_vmi(uuid, 'connections')
             # threads.append(t)
