@@ -16,10 +16,10 @@ web.config.debug = False
 db = web.database(dbn=db_engine, host=db_server, db=db_database, 
 							   user=db_username, pw=db_password)
 
-ret = db.select('cloud_vhost',what='uuid,name,profile', where="`windows`=0")
+ret = db.select('cloud_vhost',what='uuid,name,windows,profile')
 profiles = {}
 for line in ret:
-    profiles[line['uuid']] = (line['name'], line['profile'])
+    profiles[line['uuid']] = (line['windows'], line['name'], line['profile'])
 
 def GetFileMd5(filename):
     if not os.path.isfile(filename):
@@ -34,9 +34,9 @@ def GetFileMd5(filename):
     f.close()
     return myhash.hexdigest()
 
-class command(threading.Thread):
+class command_vmi(threading.Thread):
     def __init__(self, uuid, command):
-        super(command, self).__init__()
+        super(command_vmi, self).__init__()
         self.daemon = True
         self.uuid = uuid
         self.command = command
@@ -44,8 +44,8 @@ class command(threading.Thread):
     def run(self):
         table = 'vol_history'
         while True:
-            profile = profiles[self.uuid]
-            cmd = 'python vol.py -f images/%s.dd --profile=%s %s' % (self.uuid, profile, self.command)
+            (win, name, profile) = profiles[self.uuid]
+            cmd = 'python vol.py -l vmi://%s --profile=%s %s' % (name, profile, self.command)
             res = os.popen(cmd).read()
             # logger.debug(res)
 
@@ -72,7 +72,7 @@ class linux_file_change(threading.Thread):
     def run(self):
         while True:
             table = 'file_change_history'
-            (name, profile) = profiles[self.uuid]
+            (win, name, profile) = profiles[self.uuid]
             cmd = 'python vol.py -l vmi://%s --profile=%s linux_find_file -F "%s"' % (name, profile, self.path)
             res = os.popen(cmd).read()
             # logger.debug(res)
@@ -126,13 +126,55 @@ def main():
 
     threads = []
     # print profiles
-    for (uuid,(name,profile)) in profiles.items():
-        ret = db.select('file_monitor_list',what='uuid,path', where="`uuid`='%s'" % uuid)
-        # t = command(k, 'linux_psaux')
-        for line in ret:
-            t = linux_file_change(uuid, line['path'])
+    for (uuid,(win,name,profile)) in profiles.items():
+        if win == 1:
+            # windows进程列表
+            t = command_vmi(uuid, 'pslist')
             threads.append(t)
+            # windows注册表
+            t = command_vmi(uuid, 'hivelist')
+            threads.append(t)
+            # windows进程dll信息
+            t = command_vmi(uuid, 'dlllist')
+            threads.append(t)
+            # windows网络连接
+            # t = command_vmi(uuid, 'connections')
+            # threads.append(t)
+            # windows环境变量
+            t = command_vmi(uuid, 'envars')
+            threads.append(t)
+            # windows sockets
+            # t = command_vmi(uuid, 'sockets')
+            # threads.append(t)
+            # windows 网络信息
+            t = command_vmi(uuid, 'netscan')
+            threads.append(t)
+            # windows 控制台
+            t = command_vmi(uuid, 'consoles')
+            threads.append(t)
+            # windows IE浏览器历史记录
+            t = command_vmi(uuid, 'iehistory')
+            threads.append(t)
+            # windows 模块信息
+            t = command_vmi(uuid, 'modules')
+            threads.append(t)
+            # windows 驱动信息
+            t = command_vmi(uuid, 'driverscan')
+            threads.append(t)
+            # windows 文件
+            t = command_vmi(uuid, 'filescan')
+            threads.append(t)
+            # windows 链接
+            t = command_vmi(uuid, 'symlinkscan')
+            threads.append(t)
+
+        # 文件变化
+        ret = db.select('file_monitor_list',what='uuid,path', where="`uuid`='%s'" % uuid)
+        for line in ret:
             logger.debug(uuid+" "+line['path'])
+            if win == 0:
+                t = linux_file_change(uuid, line['path'])
+                threads.append(t)
 
     for t in threads:
         t.setDaemon(True)

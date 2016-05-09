@@ -23,7 +23,7 @@ for line in ret:
 
 def get_processes(vmi, win):
     # print win
-    if win == 1 or win == '1':
+    if win == 1:
         tasks_offset = vmi.get_offset("win_tasks")
         name_offset = vmi.get_offset("win_pname") - tasks_offset
         pid_offset = vmi.get_offset("win_pid") - tasks_offset
@@ -47,7 +47,7 @@ def get_processes(vmi, win):
         if (list_head == next_process):
             break
 
-class Command_not_realtime(object):
+class Command_realtime_image(object):
     def GET(self, uuid, command):
         print uuid,command
         web.header('Access-Control-Allow-Origin','*')
@@ -57,12 +57,12 @@ class Command_not_realtime(object):
         res = os.popen(cmd).read()
         return res
 
-class Command_realtime(object):
+class Command_realtime_vmi(object):
     def GET(self, uuid, command):
         print uuid,command
         web.header('Access-Control-Allow-Origin','*')
         (win, name, profile) = profiles[uuid]
-        if command == 'pslist':
+        if command == 'libvmi_pslist':
             vmi = pyvmi.init(name, "complete")
             pslist = get_processes(vmi, win)
             res = ''
@@ -73,6 +73,19 @@ class Command_realtime(object):
             cmd = 'python vol.py -l vmi://%s --profile=%s %s' % (name, profile, command)
             res = os.popen(cmd).read()
             return res
+
+class Command_not_realtime(object):
+    def GET(self, uuid, command):
+        print uuid,command
+        web.header('Access-Control-Allow-Origin','*')
+        (win, name, profile) = profiles[uuid]
+
+        res = ''
+        ret = db.select('vol_history',what='uuid,command,value,time', where="`uuid`='%s' and `command`='%s'" % (uuid,command))
+        if len(ret) > 0:
+            line = ret[0]
+            res = str(line['time']) +'\n\n' + line['value']
+        return res
 
 class FileDownload(object):
     def GET(self,filename):
@@ -97,7 +110,8 @@ class FileDownload(object):
 if __name__ == '__main__':
     urls = (
         '/command/not_realtime/(.*)/(.*)','Command_not_realtime',
-        '/command/realtime/(.*)/(.*)','Command_realtime',
+        '/command/realtime/vmi/(.*)/(.*)','Command_realtime_vmi',
+        '/command/realtime/image/(.*)/(.*)','Command_realtime_image',
         '/filedownload/(.*)','FileDownload',
     )
     try:
