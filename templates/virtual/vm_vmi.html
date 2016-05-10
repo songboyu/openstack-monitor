@@ -48,13 +48,13 @@
                 <div class="well nav-collapse sidebar-nav">
                     <ul class="nav nav-tabs nav-stacked main-menu">
                         <li class="nav-header hidden-tablet">实时数据(来自vmi)</li>
+                        {% if windows == '0' %}
                         <li class="command_realtime_vmi" data="libvmi_pslist">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> 进程列表(libvmi_pslist)</span>
                             </a>
                         </li>
-                        {% if windows == '0' %}
                         <li class="command_realtime_vmi" data="linux_cpuinfo">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
@@ -85,22 +85,10 @@
                                 <span class="hidden-tablet"> 网络接口(linux_ifconfig)</span>
                             </a>
                         </li>
-                        <li class="command_realtime_vmi" data="linux_netstat">
-                            <a class="ajax_link" href="#">
-                                <i class="icon-align-justify"></i>
-                                <span class="hidden-tablet"> 网络信息(linux_netstat)</span>
-                            </a>
-                        </li>
                         <li class="command_realtime_vmi" data="linux_iomem">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> IO设备地址(linux_iomem)</span>
-                            </a>
-                        </li>
-                        <li class="command_realtime_vmi" data="linux_mount">
-                            <a class="ajax_link" href="#">
-                                <i class="icon-align-justify"></i>
-                                <span class="hidden-tablet"> 设备挂载信息(linux_mount)</span>
                             </a>
                         </li>
                         {% else %}
@@ -144,12 +132,24 @@
                         {% end %}
                     </ul>
                     <ul class="nav nav-tabs nav-stacked main-menu">
-                        <li class="nav-header hidden-tablet">实时数据(来自镜像)</li>
+                        <li class="nav-header hidden-tablet">非实时数据(来自镜像)</li>
                         {% if windows == '0' %}
                         <li class="command_realtime_image" data="linux_psaux">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> 进程列表(linux_psaux)</span>
+                            </a>
+                        </li>
+                        <li class="command_realtime_image" data="linux_mount">
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet"> 设备挂载信息(linux_mount)</span>
+                            </a>
+                        </li>
+                        <li class="command_realtime_image" data="linux_netstat">
+                            <a class="ajax_link" href="#">
+                                <i class="icon-align-justify"></i>
+                                <span class="hidden-tablet"> 网络信息(linux_netstat)</span>
                             </a>
                         </li>
                         <li class="command_realtime_image" data="linux_lsof">
@@ -159,51 +159,54 @@
                             </a>
                         </li>
                         {% else %}
-                        {% end %}
-                    </ul>
-                    <ul class="nav nav-tabs nav-stacked main-menu">
-                        <li class="nav-header hidden-tablet">非实时数据</li>
-                        {% if windows == '1' %}
-                        <li class="command_not_realtime" data="hivelist">
+                        <li class="command_realtime_image" data="hivelist">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> 注册表信息(hivelist)</span>
                             </a>
                         </li>
-                        <li class="command_not_realtime" data="consoles">
+                        <li class="command_realtime_image" data="consoles">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> 控制台信息(consoles)</span>
                             </a>
                         </li>
-                        <li class="command_not_realtime" data="symlinkscan">
+                        <li class="command_realtime_image" data="symlinkscan">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> 符号链接信息(symlinkscan)</span>
                             </a>
                         </li>
-                        <li class="command_not_realtime" data="filescan">
+                        <li class="command_realtime_image" data="filescan">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> 文件列表(filescan)</span>
                             </a>
                         </li>
-                        <li class="command_not_realtime" data="driverscan">
+                        <li class="command_realtime_image" data="driverscan">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> 驱动信息(driverscan)</span>
                             </a>
                         </li>
                         
-                        <li class="command_not_realtime" data="iehistory">
+                        <li class="command_realtime_image" data="iehistory">
                             <a class="ajax_link" href="#">
                                 <i class="icon-align-justify"></i>
                                 <span class="hidden-tablet"> IE浏览历史记录(iehistory)</span>
                             </a>
                         </li>
-                        {% else %}
                         {% end %}
                     </ul>
+                    <!-- <ul class="nav nav-tabs nav-stacked main-menu">
+                        <li class="nav-header hidden-tablet">非实时数据</li>
+                        {% if windows == '1' %}
+                        
+                        {% else %}
+
+                        
+                        {% end %}
+                    </ul> -->
                 </div>
             </div>
             <div id="canvasloader-container" class="wrapper"></div>
@@ -229,16 +232,39 @@
         $("#xenserver_menu").attr({"class": "active", "style": "margin-left: -2px;"});
     });
 
-    function ajax_command(url){
+    function ajax_command(url,command){
         $.ajax({
              type: "GET",
-             url: url,
+             url: url+command,
              beforeSend: function (XHR) 
              {   
                  cl.show(); // Hidden by default
              },
              success: function(data){
                  cl.hide();
+                 if(command == 'hivelist'){
+                    var lines = data.split('\n');
+
+                    data = data.slice(0,63) + '\n';
+                    lines = lines.slice(4);
+                    
+                    for(i in lines){
+                        if(lines[i] == '')
+                            continue;
+                        var addr = lines[i].split(' ')[0];
+                        var name = lines[i].split('\\').pop();
+                        name = name.replace(/\./, "")
+                        // console.log(addr);
+                        var tr = '<div class="btn-toolbar" style="margin-top:0px;margin-bottom:0px">\
+                                <div class="btn-group" style="margin: 0">\
+                                    <a class="btn btn-success" target="_blank" href="http://{{ host }}:9899/registrydownload/{{ uuid }}/registry.'+addr+'.'+name+'.reg">\
+                                        <i class="icon-globe icon-white"></i> 文件下载\
+                                    </a>\
+                                </div>\
+                            </div>'
+                        data += lines[i] + '\n' +tr;
+                    }
+                 }
                  $('#load_pre').html(data);
               }
          });
@@ -247,19 +273,19 @@
     $(".command_realtime_vmi").click(function(){
         var command = $(this).attr("data");
         console.log(command);
-        ajax_command("http://{{ host }}:9899/command/realtime/vmi/{{ uuid }}/"+command);
+        ajax_command("http://{{ host }}:9899/command/realtime/vmi/{{ uuid }}/",command);
     });
 
     $(".command_realtime_image").click(function(){
         var command = $(this).attr("data");
         console.log(command);
-        ajax_command("http://{{ host }}:9899/command/realtime/image/{{ uuid }}/"+command);
+        ajax_command("http://{{ host }}:9899/command/realtime/image/{{ uuid }}/",command);
     });
 
     $(".command_not_realtime").click(function(){
         var command = $(this).attr("data");
         console.log(command);
-        ajax_command("http://{{ host }}:9899/command/not_realtime/{{ uuid }}/"+command);
+        ajax_command("http://{{ host }}:9899/command/not_realtime/{{ uuid }}/",command);
     });
 
 </script>

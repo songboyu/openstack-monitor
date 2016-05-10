@@ -55,6 +55,7 @@ class Command_realtime_image(object):
 
         cmd = 'python vol.py -f images/%s.dd --profile=%s %s' % (uuid, profile, command)
         res = os.popen(cmd).read()
+            
         res = command+'\n\n'+res
         return res
 
@@ -88,7 +89,7 @@ class Command_not_realtime(object):
         if len(ret) > 0:
             line = ret[0]
             res = str(line['time']) +'\n\n' + line['value']
-        
+
         res = command+'\n\n'+res
         return res
 
@@ -112,12 +113,33 @@ class FileDownload(object):
             if f:
                 f.close()
 
+class RegistryDownload(object):
+    def GET(self,uuid,filename):
+        BUF_SIZE = 262144
+        try:
+            f = open('registry/%s/%s' % (uuid,filename), "rb")
+            web.header('Content-Type','application/octet-stream')
+            web.header('Content-disposition', 'attachment; filename=%s' % filename)
+            while True:
+                c = f.read(BUF_SIZE)
+                if c:
+                    yield c
+                else:
+                    break
+        except Exception, e:
+            print e
+            yield 'Error'
+        finally:
+            if f:
+                f.close()
+
 if __name__ == '__main__':
     urls = (
         '/command/not_realtime/(.*)/(.*)','Command_not_realtime',
         '/command/realtime/vmi/(.*)/(.*)','Command_realtime_vmi',
         '/command/realtime/image/(.*)/(.*)','Command_realtime_image',
         '/filedownload/(.*)','FileDownload',
+        '/registrydownload/(.*)/(.*)','RegistryDownload',
     )
     try:
         application = web.application(urls, globals()).wsgifunc()

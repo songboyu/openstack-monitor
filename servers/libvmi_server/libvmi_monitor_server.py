@@ -35,9 +35,10 @@ def GetFileMd5(filename):
     return myhash.hexdigest()
 
 class command_vmi(threading.Thread):
-    def __init__(self, uuid, command):
+    def __init__(self, vmi, uuid, command):
         super(command_vmi, self).__init__()
         self.daemon = True
+        self.vmi = vmi
         self.uuid = uuid
         self.command = command
         
@@ -45,7 +46,11 @@ class command_vmi(threading.Thread):
         table = 'vol_history'
         while True:
             (win, name, profile) = profiles[self.uuid]
-            cmd = 'python vol.py -l vmi://%s --profile=%s %s' % (name, profile, self.command)
+            if self.vmi == 1:
+                cmd = 'python vol.py -l vmi://%s --profile=%s %s' % (name, profile, self.command)
+            else:
+                cmd = 'python vol.py -l images/%s.dd --profile=%s %s' % (self.uuid, profile, self.command)
+
             res = os.popen(cmd).read()
             # logger.debug(res)
 
@@ -127,44 +132,48 @@ def main():
     threads = []
     # print profiles
     for (uuid,(win,name,profile)) in profiles.items():
-        if win == 1:
-            # windows进程列表
-            # t = command_vmi(uuid, 'pslist')
-            # threads.append(t)
-            # windows注册表
-            t = command_vmi(uuid, 'hivelist')
-            threads.append(t)
-            # windows进程dll信息
-            # t = command_vmi(uuid, 'dlllist')
-            # threads.append(t)
-            # windows网络连接
-            # t = command_vmi(uuid, 'connections')
-            # threads.append(t)
-            # windows环境变量
-            # t = command_vmi(uuid, 'envars')
-            # threads.append(t)
-            # windows sockets
-            # t = command_vmi(uuid, 'sockets')
-            # threads.append(t)
+        # if win == 1:
+        #     # windows进程列表
+        #     # t = command_vmi(uuid, 'pslist')
+        #     # threads.append(t)
+        #     # windows注册表
+        #     t = command_vmi(0, uuid, 'hivelist')
+        #     threads.append(t)
+        #     # windows进程dll信息
+        #     # t = command_vmi(uuid, 'dlllist')
+        #     # threads.append(t)
+        #     # windows网络连接
+        #     # t = command_vmi(uuid, 'connections')
+        #     # threads.append(t)
+        #     # windows环境变量
+        #     # t = command_vmi(uuid, 'envars')
+        #     # threads.append(t)
+        #     # windows sockets
+        #     # t = command_vmi(uuid, 'sockets')
+        #     # threads.append(t)
             
-            # windows 控制台
-            t = command_vmi(uuid, 'consoles')
-            threads.append(t)
-            # windows IE浏览器历史记录
-            t = command_vmi(uuid, 'iehistory')
-            threads.append(t)
-            # windows 模块信息
-            # t = command_vmi(uuid, 'modules')
-            # threads.append(t)
-            # windows 驱动信息
-            t = command_vmi(uuid, 'driverscan')
-            threads.append(t)
-            # windows 文件
-            t = command_vmi(uuid, 'filescan')
-            threads.append(t)
-            # windows 链接
-            t = command_vmi(uuid, 'symlinkscan')
-            threads.append(t)
+        #     # windows 控制台
+        #     t = command_vmi(1, uuid, 'consoles')
+        #     threads.append(t)
+        #     # windows IE浏览器历史记录
+        #     t = command_vmi(1, uuid, 'iehistory')
+        #     threads.append(t)
+        #     # windows 模块信息
+        #     # t = command_vmi(uuid, 'modules')
+        #     # threads.append(t)
+        #     # windows 驱动信息
+        #     t = command_vmi(1, uuid, 'driverscan')
+        #     threads.append(t)
+        #     # windows 文件
+        #     t = command_vmi(1, uuid, 'filescan')
+        #     threads.append(t)
+        #     # windows 链接
+        #     t = command_vmi(1, uuid, 'symlinkscan')
+        #     threads.append(t)
+        # else:
+        #     # linux 挂载信息
+        #     t = command_vmi(1, uuid, 'linux_mount')
+        #     threads.append(t)
 
         # 文件变化
         ret = db.select('file_monitor_list',what='uuid,path', where="`uuid`='%s'" % uuid)
